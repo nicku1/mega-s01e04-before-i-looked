@@ -1,4 +1,20 @@
-import type { Status } from '../status.js';
+import type { NightOnDisk, Status } from '../status.js';
+
+// Missing counts render as `—`, never as a dropped cell (docs/styleguide.md).
+function count(value: number | null | undefined): string {
+  return value === null || value === undefined ? '—' : String(value);
+}
+
+function Night({ entry }: { entry: NightOnDisk }) {
+  return (
+    <li>
+      <a href={`/digest/${entry.night}`}>{entry.night}</a>{' '}
+      <span class="mute">
+        ok {count(entry.counts?.ok)} · retry {count(entry.counts?.retry)} · fail {count(entry.counts?.fail)}
+      </span>
+    </li>
+  );
+}
 
 export function StatusBoard({ status }: { status: Status }) {
   return (
@@ -19,8 +35,8 @@ export function StatusBoard({ status }: { status: Status }) {
         <p class="mute">nothing in runs/</p>
       ) : (
         <ul>
-          {status.nights.map((n) => (
-            <li>{n}</li>
+          {status.nights.map((entry) => (
+            <Night entry={entry} />
           ))}
         </ul>
       )}

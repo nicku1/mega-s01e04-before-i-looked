@@ -13,6 +13,18 @@ describe('status board', () => {
     expect(html).toContain('2026-10-28');
   });
 
+  it('links each night to its digest, counts beside it', async () => {
+    const res = await createApp(config).request('/');
+    const html = await res.text();
+
+    // The counts are over rows: the job's own lastStatus is what counts, not its runs.
+    const counts = (night: string) =>
+      html.match(new RegExp(`<a href="/digest/${night}">${night}</a> <span class="mute">([^<]*)</span>`))?.[1];
+
+    expect(counts('2026-10-28')).toBe('ok 4 · retry 0 · fail 1');
+    expect(counts('2026-10-27')).toBe('ok 4 · retry 0 · fail 0');
+  });
+
   it('health answers with the lane id', async () => {
     const res = await createApp(config).request('/health');
     expect(await res.json()).toEqual({ ok: true, lane: 'lane-07' });
