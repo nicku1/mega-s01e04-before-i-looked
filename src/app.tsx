@@ -30,5 +30,12 @@ export function createApp(config: RigConfig = loadConfig()) {
     );
   });
 
+  app.get('/api/digest/:night', (c) => {
+    // Exactly what readNight returns: same rows, same order, same time strings as the page.
+    // A night it cannot read is a 404, and nothing else is.
+    const night = readNight(config.runsDir, c.req.param('night'));
+    return night === null ? c.json({ error: 'no such night' }, 404) : c.json(night);
+  });
+
   return app;
 }
